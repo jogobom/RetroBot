@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetroBot", "RetroBot\RetroBot.csproj", "{2644A31D-C9C0-4BDE-9B56-8CF4FBB36CBD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2644A31D-C9C0-4BDE-9B56-8CF4FBB36CBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2644A31D-C9C0-4BDE-9B56-8CF4FBB36CBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2644A31D-C9C0-4BDE-9B56-8CF4FBB36CBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2644A31D-C9C0-4BDE-9B56-8CF4FBB36CBD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
