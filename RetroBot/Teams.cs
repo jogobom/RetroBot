@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace RetroBot;
 
-internal static class Teams
+internal class Teams : IPoster
 {
-    private static readonly HttpClient Client = new();
+    private readonly HttpClient client = new();
 
-    public static async Task Post(string message)
+    public async Task Post(string message)
     {
         var webhookUrl = Environment.GetEnvironmentVariable("TEAMS_WEBHOOK");
         if (!string.IsNullOrWhiteSpace(webhookUrl))
@@ -22,7 +22,7 @@ internal static class Teams
         }
     }
 
-    private static async Task Post(string message, string hook)
+    private async Task Post(string message, string hook)
     {
         var values = new Dictionary<string, string>
         {
@@ -33,6 +33,6 @@ internal static class Teams
         };
 
         var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
-        await Client.PostAsync(hook, content);
+        await client.PostAsync(hook, content);
     }
 }
