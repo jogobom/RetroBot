@@ -4,7 +4,7 @@ namespace RetroBotTests;
 
 using RetroBot;
 
-public class BotBrainTests
+public class BotBrainTestsl
 {
     private readonly DateTime lastRetrospectiveDate = new DateTime(2022, 08, 11);
 
@@ -52,6 +52,17 @@ public class BotBrainTests
         var poster = Substitute.For<IPoster>();
         
         var testDate = new DateTime(2022, 08, date);
+        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+
+        await poster.DidNotReceive().Post(Arg.Any<string>());
+    }
+    
+    [Fact]
+    public async Task ShouldNotPostAnything_On28Sep2022()
+    {
+        var poster = Substitute.For<IPoster>();
+        
+        var testDate = new DateTime(2022, 09, 28);
         await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
 
         await poster.DidNotReceive().Post(Arg.Any<string>());
