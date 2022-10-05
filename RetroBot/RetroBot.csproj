@@ -4,6 +4,7 @@
         <AzureFunctionsVersion>V4</AzureFunctionsVersion>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="MessageCards" Version="0.9.8" />
         <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
     </ItemGroup>
     <ItemGroup>

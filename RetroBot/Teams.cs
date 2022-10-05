@@ -1,11 +1,10 @@
 ﻿// Copyright © 2022 Waters Corporation. All Rights Reserved.
 
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
+using MessageCards;
 
 namespace RetroBot;
 
@@ -24,15 +23,12 @@ internal class Teams : IPoster
 
     private async Task Post(string message, string hook)
     {
-        var values = new Dictionary<string, string>
+        var card = new MessageCard("Retrospectives")
         {
-            {"@type", "MessageCard"},
-            {"@context", "https://schema.org/extensions"},
-            {"themeColor", "ff00ff"},
-            {"text", message },
+            Text = message
         };
 
-        var content = new StringContent(JsonSerializer.Serialize(values), Encoding.UTF8, "application/json");
+        var content = new StringContent(card.ToJson(), Encoding.UTF8, "application/json");
         await client.PostAsync(hook, content);
     }
 }
