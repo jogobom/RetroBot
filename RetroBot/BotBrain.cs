@@ -3,11 +3,14 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace RetroBot;
 
 public static class BotBrain
 {
+    private static readonly DateTime ReferenceRetroDate = new(2022, 8, 11, 10, 15, 00);
+    
     private static string InterimReminderText
     {
         get
@@ -61,9 +64,9 @@ public static class BotBrain
         return (int)Math.Ceiling((today - referenceDate).Days / 7.0);
     }
     
-    public static async Task Post(DateTime today, DateTime referenceDate, IPoster poster)
+    public static async Task Post(DateTime today, IPoster poster, ILogger logger)
     {
-        var numberOfWeeksIntoSprint = NumberOfWeeksSinceReferenceDate(today, referenceDate) % 4;
+        var numberOfWeeksIntoSprint = NumberOfWeeksSinceReferenceDate(today, ReferenceRetroDate) % 4;
         
         // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch (today.DayOfWeek)
@@ -73,11 +76,11 @@ public static class BotBrain
                 switch (numberOfWeeksIntoSprint)
                 {
                     case 0:
-                        Console.WriteLine("It's a Tuesday of the week that the sprint ends, so posting the 2 days before message");
+                        logger.LogInformation("It's a Tuesday of the week that the sprint ends, so posting the 2 days before message");
                         await poster.Post(TwoDaysBeforeText);
                         break;
                     default:
-                        Console.WriteLine("It's a Tuesday but not the week that the sprint ends, so don't need to post anything today");
+                        logger.LogInformation("It's a Tuesday but not the week that the sprint ends, so don't need to post anything today");
                         break;
                 }
 
@@ -88,22 +91,22 @@ public static class BotBrain
                 switch (numberOfWeeksIntoSprint)
                 {
                     case 0:
-                        Console.WriteLine("It's a Wednesday of the week that the sprint ends, so posting the 1 day before message");
+                        logger.LogInformation("It's a Wednesday of the week that the sprint ends, so posting the 1 day before message");
                         await poster.Post(OneDayBeforeText);
                         break;
                     case 2:
-                        Console.WriteLine("It's a Wednesday of 2 weeks into the sprint, so posting the interim reminder");
+                        logger.LogInformation("It's a Wednesday of 2 weeks into the sprint, so posting the interim reminder");
                         await poster.Post(InterimReminderText);
                         break;
                     default:
-                        Console.WriteLine($"It's a Wednesday but it's week {numberOfWeeksIntoSprint}, so don't need to post anything today");
+                        logger.LogInformation($"It's a Wednesday but it's week {numberOfWeeksIntoSprint}, so don't need to post anything today");
                         break;
                 }
 
                 break;
             }
             default:
-                Console.WriteLine($"It's a {today.DayOfWeek} so don't need to post anything today.");
+                logger.LogInformation($"It's a {today.DayOfWeek} so don't need to post anything today.");
                 break;
         }
     }

@@ -1,20 +1,21 @@
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Internal;
 using NSubstitute;
 
 namespace RetroBotTests;
 
 using RetroBot;
 
-public class BotBrainTestsl
+public class BotBrainTests
 {
-    private readonly DateTime lastRetrospectiveDate = new DateTime(2022, 08, 11);
+    private readonly IPoster poster = Substitute.For<IPoster>();
+    private readonly ILogger log = Substitute.For<ILogger>();
 
     [Fact]
     public async Task ShouldPostInterimReminder_2WeeksIntoSprint_OnWednesday()
     {
-        var poster = Substitute.For<IPoster>();
-
-        var testDate = new DateTime(2022, 08, 24);
-        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+        var testDate = new DateTime(2022, 08, 24, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
 
         await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("no longer have retrospectives")));
     }
@@ -22,10 +23,8 @@ public class BotBrainTestsl
     [Fact]
     public async Task ShouldPost48HourReminder_4WeeksIntoSprint_OnTuesday()
     {
-        var poster = Substitute.For<IPoster>();
-        
-        var testDate = new DateTime(2022, 09, 6);
-        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+        var testDate = new DateTime(2022, 09, 6, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
 
         await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("Thursday morning")));
     }
@@ -33,10 +32,8 @@ public class BotBrainTestsl
     [Fact]
     public async Task ShouldPost24HourReminder_4WeeksIntoSprint_OnWednesday()
     {
-        var poster = Substitute.For<IPoster>();
-        
-        var testDate = new DateTime(2022, 09, 7);
-        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+        var testDate = new DateTime(2022, 09, 7, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
 
         await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("tomorrow morning")));
     }
@@ -49,22 +46,27 @@ public class BotBrainTestsl
     [InlineData(12)]
     public async Task ShouldNotPostAnything_AtAnyOtherTime(int date)
     {
-        var poster = Substitute.For<IPoster>();
-        
-        var testDate = new DateTime(2022, 08, date);
-        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+        var testDate = new DateTime(2022, 08, date, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
 
-        await poster.DidNotReceive().Post(Arg.Any<string>());
+        await poster.DidNotReceiveWithAnyArgs().Post(default);
     }
     
     [Fact]
     public async Task ShouldNotPostAnything_On28Sep2022()
     {
-        var poster = Substitute.For<IPoster>();
-        
-        var testDate = new DateTime(2022, 09, 28);
-        await BotBrain.Post(testDate, lastRetrospectiveDate, poster);
+        var testDate = new DateTime(2022, 09, 28, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
 
-        await poster.DidNotReceive().Post(Arg.Any<string>());
+        await poster.DidNotReceiveWithAnyArgs().Post(default);
     }
+    
+    [Fact]
+    public async Task ShouldNotPostAnything_On12Oct2022()
+    {
+        var testDate = new DateTime(2022, 10, 12, 09, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
+
+        await poster.DidNotReceiveWithAnyArgs().Post(default);
+   }
 }
