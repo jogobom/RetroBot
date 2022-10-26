@@ -1,6 +1,8 @@
 ﻿// Copyright © 2022 Waters Corporation. All Rights Reserved.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,23 +11,13 @@ namespace RetroBot;
 
 public static class BotBrain
 {
-    private static readonly DateTime ReferenceRetroDate = new(2022, 8, 11, 10, 15, 00);
-    
-    private static string InterimReminderText
+    private static readonly List<DateTime> RetroDates = new()
     {
-        get
-        {
-            var messageBuilder = new StringBuilder();
-            messageBuilder.AppendLine("Reminder: We no longer have retrospectives every two weeks but if you have any thoughts about:");
-            messageBuilder.AppendLine();
-            messageBuilder.AppendLine("• What has gone well?");
-            messageBuilder.AppendLine();
-            messageBuilder.AppendLine("• Where is there an opportunity to improve?");
-            messageBuilder.AppendLine();
-            messageBuilder.AppendLine("you can submit them to @Chris Preston for the next retrospective at any time. You can also submit things anonymously if you prefer to do that, using this form: https://forms.office.com/r/AYdQ66SEU2");
-            return messageBuilder.ToString();
-        }
-    }
+        new DateTime(2022, 9, 8),
+        new DateTime(2022, 10, 6),
+        new DateTime(2022, 11, 3),
+        new DateTime(2022, 12, 1),
+    };
 
     private static string TwoDaysBeforeText
     {
@@ -59,52 +51,20 @@ public static class BotBrain
         }
     }
 
-    private static int NumberOfWeeksSinceReferenceDate(DateTime today, DateTime referenceDate)
-    {
-        return (int)Math.Ceiling((today - referenceDate).Days / 7.0);
-    }
-    
     public static async Task Post(DateTime today, IPoster poster, ILogger logger)
     {
-        var numberOfWeeksIntoSprint = NumberOfWeeksSinceReferenceDate(today, ReferenceRetroDate) % 4;
-        
-        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
-        switch (today.DayOfWeek)
+        var numberOfDaysToSprintReview = RetroDates.Select(d => d.Date - today.Date).Select(diff => diff.TotalDays).Min();
+
+        switch (numberOfDaysToSprintReview)
         {
-            case DayOfWeek.Tuesday:
-            {
-                switch (numberOfWeeksIntoSprint)
-                {
-                    case 0:
-                        logger.LogInformation("It's a Tuesday of the week that the sprint ends, so posting the 2 days before message");
-                        await poster.Post(TwoDaysBeforeText);
-                        break;
-                    default:
-                        logger.LogInformation("It's a Tuesday but not the week that the sprint ends, so don't need to post anything today");
-                        break;
-                }
-
+            case > 1 and <= 2:
+                logger.LogInformation("Posting the 2 days before message");
+                await poster.Post(TwoDaysBeforeText);
                 break;
-            }
-            case DayOfWeek.Wednesday:
-            {
-                switch (numberOfWeeksIntoSprint)
-                {
-                    case 0:
-                        logger.LogInformation("It's a Wednesday of the week that the sprint ends, so posting the 1 day before message");
-                        await poster.Post(OneDayBeforeText);
-                        break;
-                    case 2:
-                        logger.LogInformation("It's a Wednesday of 2 weeks into the sprint, so posting the interim reminder");
-                        await poster.Post(InterimReminderText);
-                        break;
-                    default:
-                        logger.LogInformation($"It's a Wednesday but it's week {numberOfWeeksIntoSprint}, so don't need to post anything today");
-                        break;
-                }
-
+            case > 0 and <= 1:
+                logger.LogInformation("Posting the 1 day before message");
+                await poster.Post(OneDayBeforeText);
                 break;
-            }
             default:
                 logger.LogInformation($"It's a {today.DayOfWeek} so don't need to post anything today.");
                 break;

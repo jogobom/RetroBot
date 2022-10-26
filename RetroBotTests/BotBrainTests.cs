@@ -12,18 +12,9 @@ public class BotBrainTests
     private readonly ILogger log = Substitute.For<ILogger>();
 
     [Fact]
-    public async Task ShouldPostInterimReminder_2WeeksIntoSprint_OnWednesday()
-    {
-        var testDate = new DateTime(2022, 08, 24, 09, 00, 00);
-        await BotBrain.Post(testDate, poster, log);
-
-        await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("no longer have retrospectives")));
-    }
-    
-    [Fact]
     public async Task ShouldPost48HourReminder_4WeeksIntoSprint_OnTuesday()
     {
-        var testDate = new DateTime(2022, 09, 6, 09, 00, 00);
+        var testDate = new DateTime(2022, 09, 6, 08, 00, 00);
         await BotBrain.Post(testDate, poster, log);
 
         await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("Thursday morning")));
@@ -32,7 +23,7 @@ public class BotBrainTests
     [Fact]
     public async Task ShouldPost24HourReminder_4WeeksIntoSprint_OnWednesday()
     {
-        var testDate = new DateTime(2022, 09, 7, 09, 00, 00);
+        var testDate = new DateTime(2022, 09, 7, 08, 00, 00);
         await BotBrain.Post(testDate, poster, log);
 
         await poster.Received(1).Post(Arg.Is<string>(s => s.Contains("tomorrow morning")));
@@ -46,7 +37,7 @@ public class BotBrainTests
     [InlineData(12)]
     public async Task ShouldNotPostAnything_AtAnyOtherTime(int date)
     {
-        var testDate = new DateTime(2022, 08, date, 09, 00, 00);
+        var testDate = new DateTime(2022, 08, date, 08, 00, 00);
         await BotBrain.Post(testDate, poster, log);
 
         await poster.DidNotReceiveWithAnyArgs().Post(default);
@@ -55,7 +46,7 @@ public class BotBrainTests
     [Fact]
     public async Task ShouldNotPostAnything_On28Sep2022()
     {
-        var testDate = new DateTime(2022, 09, 28, 09, 00, 00);
+        var testDate = new DateTime(2022, 09, 28, 08, 00, 00);
         await BotBrain.Post(testDate, poster, log);
 
         await poster.DidNotReceiveWithAnyArgs().Post(default);
@@ -64,9 +55,18 @@ public class BotBrainTests
     [Fact]
     public async Task ShouldNotPostAnything_On12Oct2022()
     {
-        var testDate = new DateTime(2022, 10, 12, 09, 00, 00);
+        var testDate = new DateTime(2022, 10, 12, 08, 00, 00);
         await BotBrain.Post(testDate, poster, log);
 
         await poster.DidNotReceiveWithAnyArgs().Post(default);
    }
+    
+    [Fact]
+    public async Task ShouldNotPostAnything_On26Oct2022()
+    {
+        var testDate = new DateTime(2022, 10, 26, 08, 00, 00);
+        await BotBrain.Post(testDate, poster, log);
+
+        await poster.DidNotReceiveWithAnyArgs().Post(default);
+    }
 }
