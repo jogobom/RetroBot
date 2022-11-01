@@ -40,7 +40,7 @@ public static class BotBrain
         get
         {
             var messageBuilder = new StringBuilder();
-            messageBuilder.AppendLine("Reminder: The next retrospective is tomorrow morning. Please send @Chris Preston **by lunchtime today***:");
+            messageBuilder.AppendLine("Reminder: The next retrospective is tomorrow morning. Please send @Chris Preston ***by lunchtime today***:");
             messageBuilder.AppendLine();
             messageBuilder.AppendLine("• What has gone well?");
             messageBuilder.AppendLine();
