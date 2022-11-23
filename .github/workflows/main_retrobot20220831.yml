@@ -4,9 +4,10 @@
 name: Deploy to Azure Function App - retrobot20220831
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [Build and test]
+    types:
+      - completed
   workflow_dispatch:
 
 env:
