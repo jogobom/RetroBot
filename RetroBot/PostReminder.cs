@@ -16,6 +16,6 @@ public static class PostReminder
 
         var today = DateTime.Today;
 
-        await BotBrain.Post(today,new Teams(), log);
+        await new BotBrain().Post(today,new Teams(), log);
     }
 }

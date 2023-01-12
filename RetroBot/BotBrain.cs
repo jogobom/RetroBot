@@ -9,15 +9,16 @@ using Microsoft.Extensions.Logging;
 
 namespace RetroBot;
 
-public static class BotBrain
+public class BotBrain
 {
-    private static readonly List<DateTime> RetroDates = new()
+    private readonly IEnumerable<DateTime> RetroDates;
+
+    public BotBrain()
     {
-        new DateTime(2022, 9, 8),
-        new DateTime(2022, 10, 6),
-        new DateTime(2022, 11, 3),
-        new DateTime(2022, 12, 1),
-    };
+        RetroDates =
+            Enumerable.Range(0, 12)
+            .Select(months => new DateTime(2023, 1, 26) + new TimeSpan(28 * months, 0, 0, 0));
+    }
 
     private static string TwoDaysBeforeText
     {
@@ -51,7 +52,7 @@ public static class BotBrain
         }
     }
 
-    public static async Task Post(DateTime today, IPoster poster, ILogger logger)
+    public async Task Post(DateTime today, IPoster poster, ILogger logger)
     {
         var numberOfDaysToSprintReview = RetroDates.Select(d => d.Date - today.Date).Select(diff => diff.TotalDays).Min();
 
